@@ -16,6 +16,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <iomanip>
 
 #include <stdio.h>
 #ifdef __linux__ 
@@ -31,9 +32,9 @@ class Coords {
 private:
 
 public:
-    float lon = 0.0F;
-    float lat = 0.0F;
-    float ele = 0.0F;
+    double lon = 0.0F;
+    double lat = 0.0F;
+    double ele = 0.0F;
     string time;
     
     Coords() {}
@@ -46,21 +47,24 @@ public:
 };
 
 static void printGeoJson(ostream &out, const vector<Coords> &coords) {
-    out << "{" << endl <<
+    bool first = true;
+    out << setprecision(7) << "{" << endl <<
         "    \"type\": \"FeatureCollection\"," << endl <<
         "    \"features\": [" << endl <<
         "        {" << endl <<
         "            \"type\": \"Feature\"," << endl <<
-        "            \"properties\": {" << endl <<
+        "            \"properties\": {" << endl;
+#if 0
+    <<
         "                \"coordTimes\": [" << endl;
         
-    bool first = true;
     for(vector<Coords>::const_iterator it = coords.begin(); it != coords.end(); it++) {
         if(first) first = false;
         else out << ", ";
         out << "\"" << (*it).time << "\"";
     }
     out << "]" << endl;
+#endif
     out << "            }," << endl;
     out << "            \"geometry\": {" << endl;
     out << "                \"type\": \"LineString\"," << endl;
