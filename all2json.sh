@@ -2,7 +2,7 @@
 
 mkdir JSON
 shopt -s nullglob
-for NAME in * ; do
+for NAME in GPX/* ; do
  filename=$(basename "$NAME");
  extension=${filename##*.};
  filename=${filename%.*};
@@ -40,7 +40,9 @@ for NAME in * ; do
 $echo
  else
  target="JSON/$TRS.js"
- ./geoJson "$NAME" | jq -c . >"$target"
  echo "$NAME" "->" "$target"
+gpsbabel -i gpx -f "$NAME" -x nuketypes,waypoints -x simplify,crosstrack,error=0.03k -o gpx -F - | \
+ ./geoJson | jq -c . >"$target"
  fi
 done
+read -p "Press enter to continue"
