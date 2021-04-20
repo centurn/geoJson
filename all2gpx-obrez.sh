@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir JSON
+mkdir GPX-obrez
 shopt -s nullglob
 for NAME in GPX/* ; do
  filename=$(basename "$NAME");
@@ -40,10 +40,9 @@ for NAME in GPX/* ; do
 # cd ..
 $echo
  else
- target="JSON/$TRS.js"
+ target="GPX-obrez/$TRS.gpx"
  echo "$NAME" "->" "$target"
-gpsbabel -i gpx -f "$NAME" -x nuketypes,waypoints -x simplify,crosstrack,error=0.03k -o gpx -F - | \
- ./geoJson | jq -c . >"$target"
+gpsbabel -i gpx -f "$NAME" -x nuketypes,waypoints -x simplify,crosstrack,error=0.2k -o gpx -F "$target"
  fi
 done
 read -p "Press enter to continue"

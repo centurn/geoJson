@@ -34,16 +34,11 @@ for NAME in GPX/* ; do
  TRS=${TRS//--/-};
  #TRS=$filename
  if [[ `file -b "$NAME"` == directory ]]; then
-# mv -v "$NAME" "$TRS"
-# cd "$TRS"
-# "$0"
-# cd ..
 $echo
  else
  target="JSON/$TRS.js"
  echo "$NAME" "->" "$target"
-gpsbabel -i gpx -f "$NAME" -x nuketypes,waypoints -x simplify,crosstrack,error=0.03k -o gpx -F - | \
- ./geoJson | jq -c . >"$target"
+./geoJson "$NAME" | jq -c . >"$target"
  fi
 done
 read -p "Press enter to continue"
