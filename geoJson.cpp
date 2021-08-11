@@ -68,22 +68,19 @@ static void printGeoJson(ostream &out, const vector<Coords> &coords) {
     out << "            }," << endl;
     out << "            \"geometry\": {" << endl;
     out << "                \"type\": \"LineString\"," << endl;
-    out << "                \"coordinates\": [" << endl;
+    out << "                \"coordinates\": [";// << endl;
 
     
     first = true;
     for(vector<Coords>::const_iterator it = coords.begin(); it != coords.end(); it++) {
-        if(first) first = false;
-        else out << ", " << endl;
-        
-        out << "                    [" << endl;
-        out << "                        " << (*it).lon << "," << endl;
-        out << "                        " << (*it).lat << "," << endl;
-        out << "                        " << (*it).ele << endl;
-        out << "                    ]";
+        if(first)
+            first = false;
+        else
+            out << ",";
+        out << "[" << (*it).lon << "," << (*it).lat << "," << (*it).ele << "]";
     }
 
-    out << endl;
+    //out << endl;
     out << "                ]" << endl;
     out << "            }" << endl;
     out << "        }" << endl;
