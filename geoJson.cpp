@@ -46,44 +46,52 @@ public:
     }
 };
 
-static void printGeoJson(ostream &out, const vector<Coords> &coords) {
-    bool first = true;
+static void printGeoJson(ostream &out, const vector<vector<Coords> > &segments) {
     out << setprecision(7) << "{" << endl <<
         "    \"type\": \"FeatureCollection\"," << endl <<
-        "    \"features\": [" << endl <<
-        "        {" << endl <<
-        "            \"type\": \"Feature\"," << endl <<
-        "            \"properties\": {" << endl;
-#if 0
-    <<
-        "                \"coordTimes\": [" << endl;
-        
-    for(vector<Coords>::const_iterator it = coords.begin(); it != coords.end(); it++) {
-        if(first) first = false;
-        else out << ", ";
-        out << "\"" << (*it).time << "\"";
-    }
-    out << "]" << endl;
-#endif
-    out << "            }," << endl;
-    out << "            \"geometry\": {" << endl;
-    out << "                \"type\": \"LineString\"," << endl;
-    out << "                \"coordinates\": [";// << endl;
+        "    \"features\": [" << endl;
 
-    
-    first = true;
-    for(vector<Coords>::const_iterator it = coords.begin(); it != coords.end(); it++) {
-        if(first)
-            first = false;
-        else
-            out << ",";
-        out << "[" << (*it).lon << "," << (*it).lat << "," << (*it).ele << "]";
-    }
+    bool first_seg = true;
+    for(auto const& coords: segments){
+        if(first_seg){
+            first_seg = false;
+            out << "        {";
+        }else
+            out << "       ,{";
 
-    //out << endl;
-    out << "                ]" << endl;
-    out << "            }" << endl;
-    out << "        }" << endl;
+     out << "\"type\": \"Feature\"," << endl <<
+            "            \"properties\": {" << endl;
+    #if 0
+        <<
+            "                \"coordTimes\": [" << endl;
+
+        for(vector<Coords>::const_iterator it = coords.begin(); it != coords.end(); it++) {
+            if(first) first = false;
+            else out << ", ";
+            out << "\"" << (*it).time << "\"";
+        }
+        out << "]" << endl;
+    #endif
+        out << "            }," << endl;
+        out << "            \"geometry\": {" << endl;
+        out << "                \"type\": \"LineString\"," << endl;
+        out << "                \"coordinates\": [";// << endl;
+
+
+        bool first = true;
+        for(vector<Coords>::const_iterator it = coords.begin(); it != coords.end(); it++) {
+            if(first)
+                first = false;
+            else
+                out << ",";
+            out << "[" << (*it).lon << "," << (*it).lat << "," << (*it).ele << "]";
+        }
+
+        //out << endl;
+        out << "                ]" << endl;
+        out << "            }" << endl;
+        out << "        }" << endl;
+    }
     out << "    ]" << endl;
     out << "}" << endl;
 }
@@ -110,13 +118,15 @@ static bool processStream(istream &in, ostream &out = cout) {
         for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
             attrs[attr->name()] = attr->value();
 
-        vector<Coords> coords;
+        vector<vector<Coords> > segments;
 
         // Read out tracks
         for (xml_node<> *child = node->first_node("trk"); child; child = child->next_sibling("trk"))
         {
             // Scan for track segments
             for (xml_node<> *seg = child->first_node("trkseg"); seg; seg = seg->next_sibling("trkseg")) {
+                segments.push_back({});
+                auto& coords = segments.back();
                 // And track points
                 for (xml_node<> *pt = seg->first_node("trkpt"); pt; pt = pt->next_sibling("trkpt")) {
                     
@@ -143,7 +153,7 @@ static bool processStream(istream &in, ostream &out = cout) {
             }
         }
         
-        printGeoJson(out, coords);
+        printGeoJson(out, segments);
         
     } catch (parse_error &e) {
         cerr << "Parse error: " << e.what() << endl;
